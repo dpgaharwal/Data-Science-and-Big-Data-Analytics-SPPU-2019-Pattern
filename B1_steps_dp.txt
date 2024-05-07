@@ -1,0 +1,157 @@
+## WordCount.java
+
+```java
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class WordCount {
+
+  public static class TokenizerMapper
+       extends Mapper<Object, Text, Text, IntWritable>{
+
+    private final static IntWritable one = new IntWritable(1);
+    private Text word = new Text();
+
+    public void map(Object key, Text value, Context context
+                    ) throws IOException, InterruptedException {
+      StringTokenizer itr = new StringTokenizer(value.toString());
+      while (itr.hasMoreTokens()) {
+        word.set(itr.nextToken());
+        context.write(word, one);
+      }
+    }
+  }
+
+  public static class IntSumReducer
+       extends Reducer<Text,IntWritable,Text,IntWritable> {
+    private IntWritable result = new IntWritable();
+
+    public void reduce(Text key, Iterable<IntWritable> values,
+                       Context context
+                       ) throws IOException, InterruptedException {
+      int sum = 0;
+      for (IntWritable val : values) {
+        sum += val.get();
+      }
+      result.set(sum);
+      context.write(key, result);
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
+    Configuration conf = new Configuration();
+    Job job = Job.getInstance(conf, "word count");
+    job.setJarByClass(WordCount.class);
+    job.setMapperClass(TokenizerMapper.class);
+    job.setCombinerClass(IntSumReducer.class);
+    job.setReducerClass(IntSumReducer.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
+    FileInputFormat.addInputPath(job, new Path(args[0]));
+    FileOutputFormat.setOutputPath(job, new Path(args[1]));
+    System.exit(job.waitForCompletion(true) ? 0 : 1);
+  }
+}
+```
+
+[WordCount.java](https://prod-files-secure.s3.us-west-2.amazonaws.com/bd495344-932e-402f-8a70-bc70825042ed/2d12b7c2-ecaf-46dd-ba56-aebc4ff78fce/WordCount.java)
+
+# **Steps:**
+
+1. Make sure Hadoop is installed and running: 
+
+```
+**hadoop version
+javac -version**
+```
+
+1. (Make folder **WordCountTutorial** folder and make WordCount.java file in which code is written
+2. Now, create new folder for input_data.
+Add your own text file(input.txt) in this folder.
+3. Add words as many as can.
+4. Create new folder(tutorial_classes) to hold the java class files
+5. Now,set HADOOP_CALSSPATH enviorment variable.
+
+```
+**export  HADOOP_CLASSPATH=$(hadoop classpath)**
+```
+
+1. Make sure it has been set correctly:
+
+```
+**echo $HADOOP_CLASSPATH**
+```
+
+1. Create a directory on HDFS
+
+```
+**hadoop fs -mkdir <DIRECTORY_NAME>
+
+hadoop fs -mkdir /WordCountTutorial(folder name)**
+```
+
+1. And create directory inside it for the input
+
+```
+**hadoop fs -mkdir <HDFS_INPUT_DIRECTORY>
+
+hadoop fs -mkdir /WordCountTutorial/Input**
+```
+
+1. Upload the input file to that directory:
+
+```
+**hadoop fs -put <INPUT_FILE> <HDFS_INPUT_DIRECTORY>
+
+hadoop fs -put ‘INPUT_FILE’ /WordCountTurorial/Input** 
+```
+
+1. Change the current directory to the tutorial directory
+
+```
+**cd <TUTORIAL_DIRECTORY>
+
+cd /home/sheela/Desktop/WordCountTutorial**
+```
+
+1. Compile the java code:
+
+```
+**javac -classpath ${HADOOP_CLASSPATH} -d <CLASS_FOLDER> <TUTORIAL_JAVA_FILE>
+javac -classpath ${HADOOP_CLASSPATH} -d ‘tutorialclasses folder path’ ‘WordCount.java file path’**
+```
+
+1. 3 Files .class are created in the tutorial_classes folder
+2. Put the output files in one jar file:
+
+```
+**jar -cvf <JAR_FILE_NAME> -C <CLASSES_FOLDER> .
+
+jar -cvf firstTutorial.jar -C tutorial_classes/ .**
+```
+
+1. Run jar file on hadoop
+
+```
+**hadoop jar <JAR_FILE> <CLASS_NAME> <HDFS_INPUT_DIRECTORY> <HDFS_OUTPUT_DIRECTORY>
+
+hadoop jar ‘jar file location’ WordCount /WordCountTutorial/Input /WordCountTutorial/Output**
+```
+
+1. Output:
+
+```
+**hadoop dfs -cat <HDFS_OUTPUT_DIRECTORY>*
+
+hadoop dfs -cat  /WordCountTutorial/Output/***
+```

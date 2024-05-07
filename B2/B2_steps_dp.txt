@@ -1,0 +1,49 @@
+# Steps
+
+1. su - hadoopusr
+2.  (Starting Hadoop) 
+su 
+3. start-yarn.sh
+4. jps
+5. cd /usr/local/hbase/bin
+6. start hbase
+7. cd
+8. jps
+9. ls (Check galvon directory)
+10. sudo mkdir analogs
+11. ls (now created analog directory
+12. sudo chmod -R 777 analogs
+13. ls
+14. sudo chown -R hadoppusr analogs/ 
+15. cd analogs/ 
+16. (There are access_log_sort.txt,hadoop-mapreduce-example-file.txt,SalesCountryDriver.java, SalesCountryReduce.java, SalesMapper.java)
+17. cd
+18. sudo cp (FOLDER_PATH_WHERE ALLFILES ARE SAVE)/* ~/analogs/ 
+19. cd analogs/ 
+20. ls
+21. which hadoop (hadoop home location are given by terminal)
+22. jps
+23. After that convert accesss_log_short.txt to csv file
+24. sudo cp (FOLDER_PATH_WHERE ALLFILES ARE SAVE)/* `/analogs/
+25. ls
+26. sudo chmod +r *.* 
+27. pwd
+28. copy text from hadoop mapreduce-example-file.txt (export……./lib/*” ) (change pwd analze name with jar:~/….  )
+29. ls
+30. javac -d . SalesMapper.java SalesCountryReducer.java SalesCountryDriver.java
+31. ls
+32. cd (Come to analogs)
+33. cd analogs/ 
+34. ls
+35. sudo gedit Manifest.txt (Main-Class: SalesCountry.SalesCountryDriver)
+36. ls
+37. jar -cfm analogs.jar Manifest.txt SalesCountry/*.txt
+38. ls
+39. jar -cfm analogs.jar Manifest.txt SalesCountry/*.class
+40. ls
+41. sudo mkdir ~/ip  
+42. sudo cp access_log_short.csv ~/ip/
+43. $HADOOP_HOME/bin/hdfs dfs -put ~/ip /
+44. $HADOOP_HOME/bin/hadoop jar analogs.jar /ip /op
+45. $HADOOP_HOME/BIN/hdfs/ dfs -vat /op/part-00000
+46. Go to [localhost:50070](http://localhost:50070) and see directory and all files created
